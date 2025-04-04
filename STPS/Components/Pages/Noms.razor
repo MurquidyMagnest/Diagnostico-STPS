@@ -1,82 +1,256 @@
 ﻿@page "/Noms"
 @using System.Text.Json
-@rendermode InteractiveServer
+
 
 @inject IConfiguration Configuracion;
 @inject HttpClient Http;
-@inject IJSRuntime JSRuntime 
+@inject IJSRuntime JSRuntime
 
 <PageTitle>Normas Oficiales Mexicanas de Seguridad y Salud en el Trabajo</PageTitle>
 
-<h3>Buscar Normas</h3>
-<input @bind="searchTerm" placeholder="Buscar Norma" @oninput="SearchNormas" />
 
-<button @onclick="() => GetNorma(searchTerm)">Obtener todas las normas</button>
+<Div Class="grid-container">
 
-@if (listaNormas != null && listaNormas.Any())
+
+	<Div Class="form-data">
+		<h3>Normas</h3>
+		<input @bind="categoria" placeholder="Categoría" />
+		<input @bind="nombre" placeholder="Nombre" />
+		<input @bind="descripcion" placeholder="Descripción" />
+		<button @onclick="() => PostNorma(categoria, nombre, descripcion)">Enviar</button>
+
+		@if (!string.IsNullOrEmpty(mensaje))
+		{
+			<p class="success-message">@mensaje</p>
+		}
+	</Div>
+
+	<Div class="table-container">
+		<input @bind="searchTerm" placeholder="Buscar norma" @oninput="SearchNormas" />
+
+		<button @onclick="() => GetNorma(searchTerm)">buscar</button>
+
+		@if (listaNormas != null && listaNormas.Any())
+		{
+			<DataGrid TItem="Normas" Data="@listaNormas" ShowPager="true" AllowSorting="true" AllowFiltering="true"
+			PageSize="8" Class="custom-datagrid">
+				<Columns>
+					<DataGridColumn TItem="Normas" Field="id" Caption="ID" Width="50" />
+					<DataGridColumn TItem="Normas" Field="categoria_noms" Caption="Categoría" Width="150" />
+					<DataGridColumn TItem="Normas" Field="nombre_noms" Caption="Nombre" Width="200" />
+					<DataGridColumn TItem="Normas" Field="descripcion" Caption="Descripción" Width="300" />
+
+					<!-- Columna de Acciones con iconos -->
+					<DataGridColumn TItem="Normas" Caption="Acciones" Width="150">
+						<DisplayTemplate>
+							<button class="action_button" @onclick="() => DeleteNorma(context.id)">
+								<i class="fas fa-trash"></i> <!-- Icono de eliminación -->
+							</button>
+							<button class="action_button" type="button" @onclick="() => EditarNorma(context)">
+								<i class="fas fa-edit"></i> <!-- Icono de eliminación -->
+							</button>
+						</DisplayTemplate>
+					</DataGridColumn>
+
+
+
+				</Columns>
+			</DataGrid>
+
+
+		}
+		else
+		{
+			<h1>Aquí no hay nada</h1>
+		}
+	</Div>
+
+</Div>
+
+
+<!-- MODAL DE EDICIÓN -->
+@if (IsEditModalOpen)
 {
-    <DataGrid TItem="Normas" Data="@listaNormas" ShowPager="true" AllowSorting="true" AllowFiltering="true">
-        <Columns>
-            <DataGridColumn TItem="Normas" Field="id" Caption="ID" Width="100" />
-            <DataGridColumn TItem="Normas" Field="categoria_noms" Caption="Categoría" Width="200" />
-            <DataGridColumn TItem="Normas" Field="nombre_noms" Caption="Nombre" Width="250" />
-            <DataGridColumn TItem="Normas" Field="descripcion" Caption="Descripción" Width="300" />
-        </Columns>
-    </DataGrid>
+	<div class="modal-overlay">
+		<div class="modal">
+			<h3>Editar norma</h3>
+			<input @bind="normaSeleccionada.categoria_noms" placeholder="ID NOMS" />
+			<input @bind="normaSeleccionada.nombre_noms" placeholder="Descripción" />
+			<input @bind="normaSeleccionada.descripcion" placeholder="Comprobación" />
+
+			<button class="btn btn-success" @onclick="() => UpdateNormaAsync(normaSeleccionada)">Guardar Cambios</button>
+			<button class="btn btn-secondary" @onclick="() => CerrarModal()">Cancelar</button>
+		</div>
+	</div>
 }
-else
-{
-    <h1>Aquí no hay nada</h1>
-}
+
+
+
 
 @code {
-    private string? UrlApi;
-    private Normas normas = new Normas();
-    private string searchTerm = ""; 
-    private List<Normas> listaNormas = new List<Normas>(); 
+	private string? UrlApi;
+	private Normas normas = new Normas();
+	private string searchTerm = "";
+	private string categoria = "";
+	private string nombre = "";
+	private string descripcion = "";
+	private string mensaje = "";
+	private int idNoms = 0;
 
-    protected override void OnInitialized()
-    {
-        UrlApi = Configuracion["ConfiguracionesAplicacion:UrlApi"];
-    }
+	private bool IsEditModalOpen = false;
+	private Normas normaSeleccionada = new Normas();
 
-    private async Task SearchNormas()
-    {
-        await GetNorma(searchTerm); 
-    }
 
-    public async Task GetNorma(string searchTerm = "")
-    {
-        var response = "";
 
-        try
-        {
-            if(searchTerm == ""){
-                response = await Http.GetStringAsync($"{UrlApi}");
-            }
-            else
-            {
-                response = await Http.GetStringAsync($"{UrlApi}/busqueda_noms?searchTerm={searchTerm}");
-            }
+	private List<Normas> listaNormas = new List<Normas>();
 
-          //  var response = await Http.GetStringAsync($"{UrlApi}/busqueda_noms?searchTerm={searchTerm}");
-            await JSRuntime.InvokeVoidAsync("console.log", response);
+	protected override async Task OnInitializedAsync()
+	{
+		UrlApi = Configuracion["ConfiguracionesAplicacion:UrlApi"];
+		await GetNorma("");
 
-            var normas = JsonSerializer.Deserialize<List<Normas>>(response);
+	}
 
-            if (normas != null)
-            {
-                listaNormas = normas; 
-                StateHasChanged(); 
-            }
-            else
-            {
-                await JSRuntime.InvokeVoidAsync("console.log", "No se recibieron datos.");
-            }
-        }
-        catch (Exception ex)
-        {
-            await JSRuntime.InvokeVoidAsync("console.log", "Error: " + ex.Message);
-        }
-    }
+	private void EditarNorma(Normas norma)
+	{
+		normaSeleccionada = new Normas
+			{
+				id = norma.id,
+				categoria_noms = norma.categoria_noms,
+				nombre_noms = norma.nombre_noms,
+				descripcion = norma.descripcion
+			};
+
+		IsEditModalOpen = true;
+	}
+
+	
+	private void CerrarModal()
+	{
+		IsEditModalOpen = false;
+	}
+
+	private async Task SearchNormas()
+	{
+		await GetNorma(searchTerm);
+	}
+
+	public async Task GetNorma(string searchTerm = "")
+	{
+		var response = "";
+
+		try
+		{
+			if (searchTerm == "")
+			{
+				response = await Http.GetStringAsync($"{UrlApi}normas");
+			}
+			else
+			{
+				response = await Http.GetStringAsync($"{UrlApi}normas/busqueda_noms?searchTerm={searchTerm}");
+			}
+
+			//  var response = await Http.GetStringAsync($"{UrlApi}/busqueda_noms?searchTerm={searchTerm}");
+			await JSRuntime.InvokeVoidAsync("console.log", response);
+
+			var normas = JsonSerializer.Deserialize<List<Normas>>(response);
+
+			if (normas != null)
+			{
+				listaNormas = normas;
+				StateHasChanged();
+			}
+			else
+			{
+				await JSRuntime.InvokeVoidAsync("console.log", "No se recibieron datos.");
+			}
+		}
+		catch (Exception ex)
+		{
+			//await JSRuntime.InvokeVoidAsync("console.log", "Error: " + ex.Message);
+		}
+	}
+
+	public async Task PostNorma(string categoria, string nombre, string descripcion)
+	{
+	
+		var nuevaNorma = new
+		{
+			categoria_noms = categoria,
+			nombre_noms = nombre,
+			descripcion = descripcion
+		};
+
+	
+		var response = await Http.PostAsJsonAsync($"{UrlApi}normas", nuevaNorma);
+
+	
+		if (response.IsSuccessStatusCode)
+		{
+			Console.WriteLine("Norma agregada correctamente.");
+			mensaje = "✅ Norma agregada correctamente.";
+			categoria = "";
+			nombre = "";
+			descripcion = "";
+
+		}
+		else
+		{
+			Console.WriteLine($"Error: {response.StatusCode}");
+			mensaje = "❌ Error al agregar la norma.";
+
+		}
+	}
+
+	private async Task DeleteNorma(int idNoms)
+	{
+		try
+		{
+			var url = $"{UrlApi}normas/{idNoms}";
+			var response = await Http.DeleteAsync(url);
+
+			if (response.IsSuccessStatusCode)
+			{
+				mensaje = "✅ Norma eliminada correctamente.";
+				GetNorma();
+			}
+			else
+			{
+				mensaje = "❌ Error al agregar al eliminar la norma.";
+			}
+		}
+		catch (Exception ex)
+		{
+			// Captura errores de conexión o cualquier excepción
+			Console.WriteLine($"Error: {ex.Message}");
+		}
+	}
+
+
+	private async Task UpdateNormaAsync(Normas norma)
+	{
+		try
+		{
+		
+			var response = await Http.PutAsJsonAsync($"{UrlApi}normas", norma);
+
+			
+			if (response.IsSuccessStatusCode)
+			{
+				mensaje = "✅ Norma actualizada correctamente.";
+			
+				await GetNorma("");  
+				CerrarModal(); 
+			}
+			else
+			{
+				mensaje = "❌ Error al actualizar la norma.";
+			}
+		}
+		catch (Exception ex)
+		{
+			mensaje = "❌ Ocurrió un error: " + ex.Message;
+		}
+	}
+	
 }

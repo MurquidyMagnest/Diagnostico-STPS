@@ -1,0 +1,56 @@
+﻿/* Estilo general del formulario */
+.form-data {
+   
+    background-color: transparent;
+    padding: 20px;
+    width: 100%;
+    max-width: 400px;
+    margin: 20px auto;
+}
+
+    /* Título del formulario */
+    .form-data h3 {
+        text-align: center;
+        color: #333;
+        margin-bottom: 20px;
+    }
+
+    /* Estilo de los inputs */
+    .form-data input {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 14px;
+        transition: border-color 0.3s;
+    }
+
+        /* Estilo cuando el input está enfocado */
+        .form-data input:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+
+    /* Estilo del botón */
+    .form-data button {
+        width: 100%;
+        padding: 12px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+        /* Estilo cuando el botón está en hover */
+        .form-data button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Estilo para los inputs y el botón si están en foco */
+        .form-data input:focus, .form-data button:focus {
+            outline: none;
+        }

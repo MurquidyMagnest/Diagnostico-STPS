@@ -1,0 +1,35 @@
+﻿.custom-datagrid {
+    font-size: 12px;
+    width: 70%;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+    background-color: #f8f9fa;
+    margin-top: 15px;
+}
+
+    /* Estilos de la tabla */
+    .custom-datagrid .table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    /* Encabezados */
+    .custom-datagrid th {
+        padding: 10px;
+        text-align: center;
+        font-weight: bold;
+        border-bottom: 2px solid #ccc;
+    }
+
+
+    /* Celdas */
+    .custom-datagrid td {
+        padding: 8px;
+        border-bottom: 1px solid #ddd;
+    }
+
+    /* Efecto hover */
+    .custom-datagrid tr:hover {
+        background-color: #f1f1f1;
+    }

@@ -8,15 +8,13 @@ var builder = WebApplication.CreateBuilder(args);
 // Agregar HttpClient a los servicios
 builder.Services.AddHttpClient();
 builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
-
 builder.Services
     .AddBlazorise(options =>
     {
-        // Si deseas otras configuraciones, agrégalas aquí
+        // Configura otras opciones aquí si es necesario
     })
     .AddBootstrapProviders()
-    .AddFontAwesomeIcons(); // Para usar iconos de Font Awesome, opcional
-
+    .AddFontAwesomeIcons(); // Si necesitas FontAwesome
 
 // Agregar Razor Components con renderizado interactivo
 builder.Services.AddRazorComponents().AddInteractiveServerComponents();

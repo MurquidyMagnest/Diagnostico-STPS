@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
@@ -7,10 +7,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Blazor.Bootstrap" Version="3.3.1" />
+    <PackageReference Include="Blazored.Typeahead" Version="4.7.0" />
     <PackageReference Include="Blazorise.Bootstrap" Version="1.7.5" />
     <PackageReference Include="Blazorise.Bootstrap5" Version="1.7.5" />
     <PackageReference Include="Blazorise.DataGrid" Version="1.7.5" />
     <PackageReference Include="Blazorise.Icons.FontAwesome" Version="1.7.5" />
+    <PackageReference Include="MudBlazor" Version="8.5.1" />
+
+
   </ItemGroup>
 
 </Project>
