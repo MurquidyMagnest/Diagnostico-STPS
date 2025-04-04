@@ -10,6 +10,8 @@ namespace API_STPS.Data
         }
 
         public DbSet<Normas> Normas { get; set; }
+        
+        public DbSet<Incisos_normas> Incisos_normas { get; set; }
 
     }
 }

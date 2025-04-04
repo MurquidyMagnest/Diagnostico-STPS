@@ -9,16 +9,17 @@ using API_STPS.Data;
 using API_STPS.Models;
 using Microsoft.SqlServer.Server;
 
+
 namespace API_STPS.Controllers
 {
 
     [ApiController]
-    [Route("api/normas")]
-    public class NormasController : ControllerBase
+    [Route("api/incisos")]
+    public class IncisosController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
 
-        public NormasController(ApplicationDbContext context)
+        public IncisosController(ApplicationDbContext context)
         {
             _context = context;
         }
@@ -34,45 +35,45 @@ namespace API_STPS.Controllers
       */
 
         [HttpPost]
-        public async Task <ActionResult> Post(Normas normas)
+        public async Task<ActionResult> Post(Incisos_normas inciso)
         {
-            _context.Add(normas);
+            _context.Add(inciso);
             await _context.SaveChangesAsync();
             return Ok();
         }
 
         [HttpGet("{id:int}")]
-        public async Task <ActionResult<Normas>> Get(int id)
+        public async Task<ActionResult<Incisos_normas>> Get(int id)
         {
-            var norma = await _context.Normas.FirstOrDefaultAsync(x => x.Id == id);
+            var inciso = await _context.Normas.FirstOrDefaultAsync(x => x.Id == id);
 
-            if (norma is null)
+            if (inciso is null)
             {
                 return NotFound();
             }
 
-            return Ok(norma);
+            return Ok(inciso);
         }
 
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Normas>>> Get()
+        public async Task<ActionResult<IEnumerable<Incisos_normas>>> Get()
         {
             // Obtener todos los registros de la base de datos
-            var normas = await _context.Normas.ToListAsync();
+            var inciso = await _context.Incisos_normas.ToListAsync();
 
             // Si no hay registros, devolver un NotFound
-            if (normas == null || !normas.Any())
+            if (inciso == null || !inciso.Any())
             {
                 return NotFound();
             }
 
             // Devolver todos los registros como JSON (esto es lo que devuelve por defecto)
-            return Ok(normas);
+            return Ok(inciso);
         }
 
-        [HttpGet("busqueda_noms")]
-        public async Task<ActionResult<IEnumerable<Normas>>> GetNormas([FromQuery] string searchTerm)
+        [HttpGet("busqueda_inciso")]
+        public async Task<ActionResult<IEnumerable<Incisos_normas>>> GetInciso([FromQuery] string searchTerm)
         {
             if (string.IsNullOrEmpty(searchTerm))
             {
@@ -82,16 +83,16 @@ namespace API_STPS.Controllers
             try
             {
                 // Filtrar las normas por el término de búsqueda en 'nombre_noms' o 'descripcion'
-                var normas = await _context.Normas
-                    .Where(n => n.nombre_noms.Contains(searchTerm) || n.descripcion.Contains(searchTerm))
+                var inciso = await _context.Incisos_normas
+                    .Where(n => n.inciso_noms.Contains(searchTerm) || n.descripcion.Contains(searchTerm))
                     .ToListAsync();
 
-                if (normas == null || normas.Count == 0)
+                if (inciso == null || inciso.Count == 0)
                 {
                     return NotFound("No se encontraron normas que coincidan con el término de búsqueda.");
                 }
 
-                return Ok(normas);
+                return Ok(inciso);
             }
             catch (Exception ex)
             {
@@ -101,26 +102,30 @@ namespace API_STPS.Controllers
         }
 
         [HttpPut]
-        public void PutNorma(Normas norma)
+        public void PutInciso(Incisos_normas inciso)
         {
-            var normaExistente = _context.Normas.Find(norma.Id);
-            if (normaExistente != null)
+            var incisoExistente = _context.Incisos_normas.Find(inciso.Id);
+            if (incisoExistente != null)
             {
-                normaExistente.categoria_noms = norma.categoria_noms;
-                normaExistente.nombre_noms = norma.nombre_noms;
-                normaExistente.descripcion = norma.descripcion;
+                incisoExistente.id_noms = inciso.id_noms;
+                incisoExistente.inciso_noms = inciso.inciso_noms;
+                incisoExistente.descripcion = inciso.descripcion;
+                incisoExistente.comprobacion = inciso.comprobacion;
+                incisoExistente.criterio_acepton = inciso.criterio_acepton;
+                incisoExistente.observacion = inciso.observacion;
+
 
                 _context.SaveChanges();
             }
         }
 
         [HttpDelete("{id:int}")]
-        public void DeleteNorma(int id)
+        public void DeleteInciso(int id)
         {
-            var norma = _context.Normas.Find(id);
-            if (norma != null)
+            var inciso = _context.Incisos_normas.Find(id);
+            if (inciso != null)
             {
-                _context.Normas.Remove(norma);
+                _context.Incisos_normas.Remove(inciso);
                 _context.SaveChanges();
             }
         }
