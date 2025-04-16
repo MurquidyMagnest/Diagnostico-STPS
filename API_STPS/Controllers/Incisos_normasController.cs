@@ -10,6 +10,7 @@ using API_STPS.Models;
 using Microsoft.SqlServer.Server;
 
 
+
 namespace API_STPS.Controllers
 {
 
@@ -55,7 +56,23 @@ namespace API_STPS.Controllers
             return Ok(inciso);
         }
 
+        [HttpGet("noms/{id:int}")]
+        public async Task<ActionResult<Incisos_normas>> GetNorma(int id)
+        {
+            // Obtén todos los registros que coincidan con el id_noms
+            var inciso = await _context.Incisos_normas
+                .Where(x => x.id_noms == id)
+                .ToListAsync();
 
+            if (inciso is null)
+            {
+                return NotFound();
+            }
+
+            return Ok(inciso);
+        }
+
+        /*
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Incisos_normas>>> Get()
         {
@@ -71,6 +88,43 @@ namespace API_STPS.Controllers
             // Devolver todos los registros como JSON (esto es lo que devuelve por defecto)
             return Ok(inciso);
         }
+        */
+
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<IncisoNormaDTO>>> Get()
+        {
+            // Realizamos la consulta con un LEFT JOIN usando LINQ
+            var resultado = from icn in _context.Incisos_normas
+                            join nm in _context.Normas
+                            on icn.id_noms equals nm.Id into grupo
+                            from norma in grupo.DefaultIfEmpty() // LEFT JOIN
+                            select new IncisoNormaDTO
+                            {
+                                Id = icn.Id,
+                                id_noms = norma != null ? norma.Id : (int?)null,
+                                nombre_noms = norma != null ? norma.nombre_noms : null,
+                                inciso_noms = icn.inciso_noms,
+                                descripcion = icn.descripcion,
+                                comprobacion = icn.comprobacion,
+                                criterio_acepton = icn.criterio_acepton,
+                                observacion = icn.observacion
+                            };
+
+            // Obtener los datos de la base de datos
+            var inciso = await resultado.ToListAsync();
+
+            // Si no hay registros, devolver un NotFound
+            if (inciso == null || !inciso.Any())
+            {
+                return NotFound();
+            }
+
+            // Devolver todos los registros como JSON (esto es lo que devuelve por defecto)
+            return Ok(inciso);
+        }
+
+
+
 
         [HttpGet("busqueda_inciso")]
         public async Task<ActionResult<IEnumerable<Incisos_normas>>> GetInciso([FromQuery] string searchTerm)
@@ -101,6 +155,58 @@ namespace API_STPS.Controllers
             }
         }
 
+
+
+
+        [HttpGet("incisos_normas")]
+        public async Task<ActionResult<IEnumerable<IncisoNormaDTO>>> GetIncisos([FromQuery] string? searchTerm = null)
+        {
+            try
+            {
+                // Realizamos la consulta con un LEFT JOIN usando LINQ
+                var resultado = from icn in _context.Incisos_normas
+                                join nm in _context.Normas
+                                on icn.id_noms equals nm.Id into grupo
+                                from norma in grupo.DefaultIfEmpty() // LEFT JOIN
+                                select new IncisoNormaDTO
+                                {
+                                    Id = icn.Id,
+                                    id_noms = norma != null ? norma.Id : (int?)null,
+                                    nombre_noms = norma != null ? norma.nombre_noms : null,
+                                    inciso_noms = icn.inciso_noms,
+                                    descripcion = icn.descripcion,
+                                    comprobacion = icn.comprobacion,
+                                    criterio_acepton = icn.criterio_acepton,
+                                    observacion = icn.observacion
+                                };
+
+                // Si hay un término de búsqueda, filtrar los resultados
+                if (!string.IsNullOrEmpty(searchTerm))
+                {
+                    resultado = resultado.Where(icn => icn.inciso_noms.Contains(searchTerm) || icn.descripcion.Contains(searchTerm));
+                }
+
+                // Obtener los resultados de la base de datos
+                var inciso = await resultado.ToListAsync();
+
+                // Si no hay registros, devolver un NotFound
+                if (inciso == null || !inciso.Any())
+                {
+                    return NotFound("No se encontraron registros que coincidan con el término de búsqueda.");
+                }
+
+                return Ok(inciso);
+            }
+            catch (Exception ex)
+            {
+                // Registrar el error para depuración
+                return StatusCode(500, $"Error interno del servidor: {ex.Message}");
+            }
+        }
+
+
+
+
         [HttpPut]
         public void PutInciso(Incisos_normas inciso)
         {
@@ -129,6 +235,8 @@ namespace API_STPS.Controllers
                 _context.SaveChanges();
             }
         }
+
+
 
     }
 }

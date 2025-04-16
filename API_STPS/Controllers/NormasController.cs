@@ -23,15 +23,7 @@ namespace API_STPS.Controllers
             _context = context;
         }
 
-        /*
-        [HttpGet]
-        public IEnumerable<Normas> Get
-        public async Task<IActionResult> Index()
-        {
-            return View(await _context.Normas.ToListAsync());
-        }
 
-      */
 
         [HttpPost]
         public async Task <ActionResult> Post(Normas normas)
