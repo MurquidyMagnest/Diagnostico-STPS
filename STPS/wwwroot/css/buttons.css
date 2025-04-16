@@ -1,0 +1,59 @@
+﻿.btn-agregar {
+    background-color: #B08438;
+    color: white;
+    padding: 7px 14px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+    .btn-agregar:hover {
+        background-color: #9c7127;
+    }
+
+
+/* ----------------------BARRA DE BUSQUEDA-------------------------------- */
+
+.datatable-search {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.search-input {
+    padding: 4px 8px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    height: 30px;
+    width: 180px;
+}
+
+.search-button {
+    background-color: #F4F4F4;
+    border: none;
+    border-radius: 6px;
+    padding: 5px 10px;
+    font-size: 14px;
+    height: 30px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    border: 1px solid #ccc;
+}
+
+    .search-button:hover {
+        background-color: #e9ecef;
+    }
+
+
+/* ---------------------- ACTION BUTTONS -------------------------------- */
+
+.action-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 8px; /* espacio entre los botones */
+}

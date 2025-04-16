@@ -1,0 +1,520 @@
+[33mcommit 127ad8f5d142fcda2513f10d1bdeec36bdb742e6[m
+Author: MurquidyMagnest <murquidy@magnest.mx>
+Date:   Fri Apr 4 14:10:59 2025 -0600
+
+    Revert "Agregar archivos de proyecto."
+    
+    This reverts commit 140465b774c0c2bac74533daf559ba06b4ca5f86.
+
+[1mdiff --git a/API_STPS.sln b/API_STPS.sln[m
+[1mdeleted file mode 100644[m
+[1mindex c8977c8..0000000[m
+[1m--- a/API_STPS.sln[m
+[1m+++ /dev/null[m
+[36m@@ -1,25 +0,0 @@[m
+[31m-﻿[m
+[31m-Microsoft Visual Studio Solution File, Format Version 12.00[m
+[31m-# Visual Studio Version 17[m
+[31m-VisualStudioVersion = 17.13.35828.75 d17.13[m
+[31m-MinimumVisualStudioVersion = 10.0.40219.1[m
+[31m-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "API_STPS", "API_STPS\API_STPS.csproj", "{65D5B310-06F3-48B5-99BE-D5F98E7B5091}"[m
+[31m-EndProject[m
+[31m-Global[m
+[31m-	GlobalSection(SolutionConfigurationPlatforms) = preSolution[m
+[31m-		Debug|Any CPU = Debug|Any CPU[m
+[31m-		Release|Any CPU = Release|Any CPU[m
+[31m-	EndGlobalSection[m
+[31m-	GlobalSection(ProjectConfigurationPlatforms) = postSolution[m
+[31m-		{65D5B310-06F3-48B5-99BE-D5F98E7B5091}.Debug|Any CPU.ActiveCfg = Debug|Any CPU[m
+[31m-		{65D5B310-06F3-48B5-99BE-D5F98E7B5091}.Debug|Any CPU.Build.0 = Debug|Any CPU[m
+[31m-		{65D5B310-06F3-48B5-99BE-D5F98E7B5091}.Release|Any CPU.ActiveCfg = Release|Any CPU[m
+[31m-		{65D5B310-06F3-48B5-99BE-D5F98E7B5091}.Release|Any CPU.Build.0 = Release|Any CPU[m
+[31m-	EndGlobalSection[m
+[31m-	GlobalSection(SolutionProperties) = preSolution[m
+[31m-		HideSolutionNode = FALSE[m
+[31m-	EndGlobalSection[m
+[31m-	GlobalSection(ExtensibilityGlobals) = postSolution[m
+[31m-		SolutionGuid = {3FF7AFEF-5A73-480D-84D0-2E926D873BD0}[m
+[31m-	EndGlobalSection[m
+[31m-EndGlobal[m
+[1mdiff --git a/API_STPS/API_STPS.csproj b/API_STPS/API_STPS.csproj[m
+[1mdeleted file mode 100644[m
+[1mindex fa4ea39..0000000[m
+[1m--- a/API_STPS/API_STPS.csproj[m
+[1m+++ /dev/null[m
+[36m@@ -1,19 +0,0 @@[m
+[31m-<Project Sdk="Microsoft.NET.Sdk.Web">[m
+[31m-[m
+[31m-  <PropertyGroup>[m
+[31m-    <TargetFramework>net9.0</TargetFramework>[m
+[31m-    <Nullable>enable</Nullable>[m
+[31m-    <ImplicitUsings>enable</ImplicitUsings>[m
+[31m-  </PropertyGroup>[m
+[31m-[m
+[31m-  <ItemGroup>[m
+[31m-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.3" />[m
+[31m-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.3" />[m
+[31m-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.3">[m
+[31m-      <PrivateAssets>all</PrivateAssets>[m
+[31m-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>[m
+[31m-    </PackageReference>[m
+[31m-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="9.0.0" />[m
+[31m-  </ItemGroup>[m
+[31m-[m
+[31m-</Project>[m
+[1mdiff --git a/API_STPS/API_STPS.http b/API_STPS/API_STPS.http[m
+[1mdeleted file mode 100644[m
+[1mindex 2c5217d..0000000[m
+[1m--- a/API_STPS/API_STPS.http[m
+[1m+++ /dev/null[m
+[36m@@ -1,6 +0,0 @@[m
+[31m-@API_STPS_HostAddress = http://localhost:5168[m
+[31m-[m
+[31m-GET {{API_STPS_HostAddress}}/weatherforecast/[m
+[31m-Accept: application/json[m
+[31m-[m
+[31m-###[m
+[1mdiff --git a/API_STPS/Controllers/NormasController.cs b/API_STPS/Controllers/NormasController.cs[m
+[1mdeleted file mode 100644[m
+[1mindex 949d430..0000000[m
+[1m--- a/API_STPS/Controllers/NormasController.cs[m
+[1m+++ /dev/null[m
+[36m@@ -1,105 +0,0 @@[m
+[31m-﻿using System;[m
+[31m-using System.Collections.Generic;[m
+[31m-using System.Linq;[m
+[31m-using System.Threading.Tasks;[m
+[31m-using Microsoft.AspNetCore.Mvc;[m
+[31m-using Microsoft.AspNetCore.Mvc.Rendering;[m
+[31m-using Microsoft.EntityFrameworkCore;[m
+[31m-using API_STPS.Data;[m
+[31m-using API_STPS.Models;[m
+[31m-using Microsoft.SqlServer.Server;[m
+[31m-[m
+[31m-namespace API_STPS.Controllers[m
+[31m-{[m
+[31m-[m
+[31m-    [ApiController][m
+[31m-    [Route("api/normas")][m
+[31m-    public class NormasController : ControllerBase[m
+[31m-    {[m
+[31m-        private readonly ApplicationDbContext _context;[m
+[31m-[m
+[31m-        public NormasController(ApplicationDbContext context)[m
+[31m-        {[m
+[31m-            _context = context;[m
+[31m-        }[m
+[31m-[m
+[31m-        /*[m
+[31m-        [HttpGet][m
+[31m-        public IEnumerable<Normas> Get[m
+[31m-        public async Task<IActionResult> Index()[m
+[31m-        {[m
+[31m-            return View(await _context.Normas.ToListAsync());[m
+[31m-        }[m
+[31m-[m
+[31m-      */[m
+[31m-[m
+[31m-        [HttpPost][m
+[31m-        public async Task <ActionResult> Post(Normas normas)[m
+[31m-        {[m
+[31m-            _context.Add(normas);[m
+[31m-            await _context.SaveChangesAsync();[m
+[31m-            return Ok();[m
+[31m-        }[m
+[31m-[m
+[31m-        [HttpGet("{id:int}")][m
+[31m-        public async Task <ActionResult<Normas>> Get(int id)[m
+[31m-        {[m
+[31m-            var norma = await _context.Normas.FirstOrDefaultAsync(x => x.Id == id);[m
+[31m-[m
+[31m-            if (norma is null)[m
+[31m-            {[m
+[31m-                return NotFound();[m
+[31m-            }[m
+[31m-[m
+[31m-            return Ok(norma);[m
+[31m-        }[m
+[31m-[m
+[31m-[m
+[31m-        [HttpGet][m
+[31m-        public async Task<ActionResult<IEnumerable<Normas>>> Get()[m
+[31m-        {[m
+[31m-            // Obtener todos los registros de la base de datos[m
+[31m-            var normas = await _context.Normas.ToListAsync();[m
+[31m-[m
+[31m-            // Si no hay registros, devolver un NotFound[m
+[31m-            if (normas == null || !normas.Any())[m
+[31m-            {[m
+[31m-                return NotFound();[m
+[31m-            }[m
+[31m-[m
+[31m-            // Devolver todos los registros como JSON (esto es lo que devuelve por defecto)[m
+[31m-            return Ok(normas);[m
+[31m-        }[m
+[31m-[m
+[31m-        [HttpGet("busqueda_noms")][m
+[31m-        public async Task<ActionResult<IEnumerable<Normas>>> GetNormas([FromQuery] string searchTerm)[m
+[31m-        {[m
+[31m-            if (string.IsNullOrEmpty(searchTerm))[m
+[31m-            {[m
+[31m-                return BadRequest("El término de búsqueda no puede estar vacío.");[m
+[31m-            }[m
+[31m-[m
+[31m-            try[m
+[31m-            {[m
+[31m-                // Filtrar las normas por el término de búsqueda en 'nombre_noms' o 'descripcion'[m
+[31m-                var normas = await _context.Normas[m
+[31m-                    .Where(n => n.nombre_noms.Contains(searchTerm) || n.descripcion.Contains(searchTerm))[m
+[31m-                    .ToListAsync();[m
+[31m-[m
+[31m-                if (normas == null || normas.Count == 0)[m
+[31m-                {[m
+[31m-                    return NotFound("No se encontraron normas que coincidan con el término de búsqueda.");[m
+[31m-                }[m
+[31m-[m
+[31m-                return Ok(normas);[m
+[31m-            }[m
+[31m-            catch (Exception ex)[m
+[31m-            {[m
+[31m-                // Registrar el error para depuración[m
+[31m-                return StatusCode(500, $"Error interno del servidor: {ex.Message}");[m
+[31m-            }[m
+[31m-        }[m
+[31m-[m
+[31m-[m
+[31m-    }[m
+[31m-}[m
+[1mdiff --git a/API_STPS/Controllers/WeatherForecastController.cs b/API_STPS/Controllers/WeatherForecastController.cs[m
+[1mdeleted file mode 100644[m
+[1mindex 864e1dc..0000000[m
+[1m--- a/API_STPS/Controllers/WeatherForecastController.cs[m
+[1m+++ /dev/null[m
+[36m@@ -1,32 +0,0 @@[m
+[31m-using Microsoft.AspNetCore.Mvc;[m
+[31m-[m
+[31m-namespace API_STPS.Controllers;[m
+[31m-[m
+[31m-[ApiController][m
+[31m-[Route("[controller]")][m
+[31m-public class WeatherForecastController : ControllerBase[m
+[31m-{[m
+[31m-    private static readonly string[] Summaries = new[][m
+[31m-    {[m
+[31m-        "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"[m
+[31m-    };[m
+[31m-[m
+[31m-    private readonly ILogger<WeatherForecastController> _logger;[m
+[31m-[m
+[31m-    public WeatherForecastController(ILogger<WeatherForecastController> logger)[m
+[31m-    {[m
+[31m-        _logger = logger;[m
+[31m-    }[m
+[31m-[m
+[31m-    [HttpGet(Name = "GetWeatherForecast")][m
+[31m-    public IEnumerable<WeatherForecast> Get()[m
+[31m-    {[m
+[31m-        return Enumerable.Range(1, 5).Select(index => new WeatherForecast[m
+[31m-        {[m
+[31m-            Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),[m
+[31m-            TemperatureC = Random.Shared.Next(-20, 55),[m
+[31m-            Summary = Summaries[Random.Shared.Next(Summaries.Length)][m
+[31m-        })[m
+[31m-        .ToArray();[m
+[31m-    }[m
+[31m-}[m
+[1mdiff --git a/API_STPS/Data/ApplicationDbContext.cs b/API_STPS/Data/ApplicationDbContext.cs[m
+[1mdeleted file mode 100644[m
+[1mindex 99739d7..0000000[m
+[1m--- a/API_STPS/Data/ApplicationDbContext.cs[m
+[1m+++ /dev/null[m
+[36m@@ -1,15 +0,0 @@[m
+[31m-﻿using Microsoft.EntityFrameworkCore;[m
+[31m-using API_STPS.Models;[m
+[31m-[m
+[31m-namespace API_STPS.Data[m
+[31m-{[m
+[31m-    public class ApplicationDbContext : DbContext[m
+[31m-    {[m
+[31m-        public ApplicationDbContext(DbContextOptions options) : base(options)[m
+[31m-        {[m
+[31m-        }[m
+[31m-[m
+[31m-        public DbSet<Normas> Normas { get; set; }[m
+[31m-[m
+[31m-    }[m
+[31m-}[m
+[1mdiff --git a/API_STPS/Migrations/20250327224420_TablaNormas.Designer.cs b/API_STPS/Migrations/20250327224420_TablaNormas.Designer.cs[m
+[1mdeleted file mode 100644[m
+[1mindex a2ca063..0000000[m
+[1m--- a/API_STPS/Migrations/20250327224420_TablaNormas.Designer.cs[m
+[1m+++ /dev/null[m
+[36m@@ -1,51 +0,0 @@[m
+[31m-﻿// <auto-generated />[m
+[31m-using API_STPS.Data;[m
+[31m-using Microsoft.EntityFrameworkCore;[m
+[31m-using Microsoft.EntityFrameworkCore.Infrastructure;[m
+[31m-using Microsoft.EntityFrameworkCore.Metadata;[m
+[31m-using Microsoft.EntityFrameworkCore.Migrations;[m
+[31m-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;[m
+[31m-[m
+[31m-#nullable disable[m
+[31m-[m
+[31m-namespace API_STPS.Migrations[m
+[31m-{[m
+[31m-    [DbContext(typeof(ApplicationDbContext))][m
+[31m-    [Migration("20250327224420_TablaNormas")][m
+[31m-    partial class TablaNormas[m
+[31m-    {[m
+[31m-        /// <inheritdoc />[m
+[31m-        protected override void BuildTargetModel(ModelBuilder modelBuilder)[m
+[31m-        {[m
+[31m-#pragma warning disable 612, 618[m
+[31m-            modelBuilder[m
+[31m-                .HasAnnotation("ProductVersion", "9.0.3")[m
+[31m-                .HasAnnotation("Relational:MaxIdentifierLength", 128);[m
+[31m-[m
+[31m-            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);[m
+[31m-[m
+[31m-            modelBuilder.Entity("API_STPS.Models.Normas", b =>[m
+[31m-                {[m
+[31m-                    b.Property<int>("Id")[m
+[31m-                        .ValueGeneratedOnAdd()[m
+[31m-                        .HasColumnType("int");[m
+[31m-[m
+[31m-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));[m
+[31m-[m
+[31m-                    b.Property<string>("categoria_noms")[m
+[31m-                        .HasColumnType("nvarchar(max)");[m
+[31m-[m
+[31m-                    b.Property<string>("descripcion")[m
+[31m-                        .HasColumnType("nvarchar(max)");[m
+[31m-[m
+[31m-                    b.Property<string>("nombre_noms")[m
+[31m-                        .HasColumnType("nvarchar(max)");[m
+[31m-[m
+[31m-                    b.HasKey("Id");[m
+[31m-[m
+[31m-                    b.ToTable("Normas");[m
+[31m-                });[m
+[31m-#pragma warning restore 612, 618[m
+[31m-        }[m
+[31m-    }[m
+[31m-}[m
+[1mdiff --git a/API_STPS/Migrations/20250327224420_TablaNormas.cs b/API_STPS/Migrations/20250327224420_TablaNormas.cs[m
+[1mdeleted file mode 100644[m
+[1mindex 623329e..0000000[m
+[1m--- a/API_STPS/Migrations/20250327224420_TablaNormas.cs[m
+[1m+++ /dev/null[m
+[36m@@ -1,36 +0,0 @@[m
+[31m-﻿using Microsoft.EntityFrameworkCore.Migrations;[m
+[31m-[m
+[31m-#nullable disable[m
+[31m-[m
+[31m-namespace API_STPS.Migrations[m
+[31m-{[m
+[31m-    /// <inheritdoc />[m
+[31m-    public partial class TablaNormas : Migration[m
+[31m-    {[m
+[31m-        /// <inheritdoc />[m
+[31m-        protected override void Up(MigrationBuilder migrationBuilder)[m
+[31m-        {[m
+[31m-            migrationBuilder.CreateTable([m
+[31m-                name: "Normas",[m
+[31m-                columns: table => new[m
+[31m-                {[m
+[31m-                    Id = table.Column<int>(type: "int", nullable: false)[m
+[31m-                        .Annotation("SqlServer:Identity", "1, 1"),[m
+[31m-                    categoria_noms = table.Column<string>(type: "nvarchar(max)", nullable: true),[m
+[31m-                    nombre_noms = table.Column<string>(type: "nvarchar(max)", nullable: true),[m
+[31m-                    descripcion = table.Column<string>(type: "nvarchar(max)", nullable: true)[m
+[31m-                },[m
+[31m-                constraints: table =>[m
+[31m-                {[m
+[31m-                    table.PrimaryKey("PK_Normas", x => x.Id);[m
+[31m-                });[m
+[31m-        }[m
+[31m-[m
+[31m-        /// <inheritdoc />[m
+[31m-        protected override void Down(MigrationBuilder migrationBuilder)[m
+[31m-        {[m
+[31m-            migrationBuilder.DropTable([m
+[31m-                name: "Normas");[m
+[31m-        }[m
+[31m-    }[m
+[31m-}[m
+[1mdiff --git a/API_STPS/Migrations/ApplicationDbContextModelSnapshot.cs b/API_STPS/Migrations/ApplicationDbContextModelSnapshot.cs[m
+[1mdeleted file mode 100644[m
+[1mindex 25fc5f5..0000000[m
+[1m--- a/API_STPS/Migrations/ApplicationDbContextModelSnapshot.cs[m
+[1m+++ /dev/null[m
+[36m@@ -1,48 +0,0 @@[m
+[31m-﻿// <auto-generated />[m
+[31m-using API_STPS.Data;[m
+[31m-using Microsoft.EntityFrameworkCore;[m
+[31m-using Microsoft.EntityFrameworkCore.Infrastructure;[m
+[31m-using Microsoft.EntityFrameworkCore.Metadata;[m
+[31m-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;[m
+[31m-[m
+[31m-#nullable disable[m
+[31m-[m
+[31m-namespace API_STPS.Migrations[m
+[31m-{[m
+[31m-    [DbContext(typeof(ApplicationDbContext))][m
+[31m-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot[m
+[31m-    {[m
+[31m-        protected override void BuildModel(ModelBuilder modelBuilder)[m
+[31m-        {[m
+[31m-#pragma warning disable 612, 618[m
+[31m-            modelBuilder[m
+[31m-                .HasAnnotation("ProductVersion", "9.0.3")[m
+[31m-                .HasAnnotation("Relational:MaxIdentifierLength", 128);[m
+[31m-[m
+[31m-            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);[m
+[31m-[m
+[31m-            modelBuilder.Entity("API_STPS.Models.Normas", b =>[m
+[31m-                {[m
+[31m-                    b.Property<int>("Id")[m
+[31m-                        .ValueGeneratedOnAdd()[m
+[31m-                        .HasColumnType("int");[m
+[31m-[m
+[31m-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));[m
+[31m-[m
+[31m-                    b.Property<string>("categoria_noms")[m
+[31m-                        .HasColumnType("nvarchar(max)");[m
+[31m-[m
+[31m-                    b.Property<string>("descripcion")[m
+[31m-                        .HasColumnType("nvarchar(max)");[m
+[31m-[m
+[31m-                    b.Property<string>("nombre_noms")[m
+[31m-                        .HasColumnType("nvarchar(max)");[m
+[31m-[m
+[31m-                    b.HasKey("Id");[m
+[31m-[m
+[31m-                    b.ToTable("Normas");[m
+[31m-                });[m
+[31m-#pragma warning restore 612, 618[m
+[31m-        }[m
+[31m-    }[m
+[31m-}[m
+[1mdiff --git a/API_STPS/Models/normas.cs b/API_STPS/Models/normas.cs[m
+[1mdeleted file mode 100644[m
+[1mindex e4cd84a..0000000[m
+[1m--- a/API_STPS/Models/normas.cs[m
+[1m+++ /dev/null[m
+[36m@@ -1,10 +0,0 @@[m
+[31m-﻿namespace API_STPS.Models[m
+[31m-{[m
+[31m-    public class Normas[m
+[31m-    {[m
+[31m-        public int Id {  get; set; }[m
+[31m-        public string? categoria_noms { get; set; }[m
+[31m-        public string? nombre_noms { get; set; }[m
+[31m-        public string? descripcion { get; set; }[m
+[31m-    }[m
+[31m-}[m
+[1mdiff --git a/API_STPS/Program.cs b/API_STPS/Program.cs[m
+[1mdeleted file mode 100644[m
+[1mindex 32d5590..0000000[m
+[1m--- a/API_STPS/Program.cs[m
+[1m+++ /dev/null[m
+[36m@@ -1,32 +0,0 @@[m
+[31m-using API_STPS.Data;[m
+[31m-using Microsoft.EntityFrameworkCore;[m
+[31m-[m
+[31m-var builder = WebApplication.CreateBuilder(args);[m
+[31m-[m
+[31m-// Add services to the container.[m
+[31m-[m
+[31m-builder.Services.AddControllers();[m
+[31m-[m
+[31m-builder.Services.AddDbContext<ApplicationDbContext>(options =>[m
+[31m-    options.UseSqlServer("name=DefaultConnection"));[m
+[31m-[m
+[31m-[m
+[31m-[m
+[31m-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi[m
+[31m-builder.Services.AddOpenApi();[m
+[31m-[m
+[31m-var app = builder.Build();[m
+[31m-[m
+[31m-// Configure the HTTP request pipeline.[m
+[31m-if (app.Environment.IsDevelopment())[m
+[31m-{[m
+[31m-    app.MapOpenApi();[m
+[31m-}[m
+[31m-[m
+[31m-app.UseHttpsRedirection();[m
+[31m-[m
+[31m-app.UseAuthorization();[m
+[31m-[m
+[31m-app.MapControllers();[m
+[31m-[m
+[31m-app.Run();[m
+[1mdiff --git a/API_STPS/Properties/launchSettings.json b/API_STPS/Properties/launchSettings.json[m
+[1mdeleted file mode 100644[m
+[1mindex a804820..0000000[m
+[1m--- a/API_STPS/Properties/launchSettings.json[m
+[1m+++ /dev/null[m
+[36m@@ -1,36 +0,0 @@[m
+[31m-{[m
+[31m-  "profiles": {[m
+[31m-    "http": {[m
+[31m-      "commandName": "Project",[m
+[31m-      "environmentVariables": {[m
+[31m-        "ASPNETCORE_ENVIRONMENT": "Development"[m
+[31m-      },[m
+[31m-      "dotnetRunMessages": true,[m
+[31m-      "applicationUrl": "http://localhost:5168"[m
+[31m-    },[m
+[31m-    "https": {[m
+[31m-      "commandName": "Project",[m
+[31m-      "environmentVariables": {[m
+[31m-        "ASPNETCORE_ENVIRONMENT": "Development"[m
+[31m-      },[m
+[31m-      "dotnetRunMessages": true,[m
+[31m-      "applicationUrl": "https://localhost:7036;http://localhost:5168"[m
+[31m-    },[m
+[31m-    "IIS Express": {[m
+[31m-      "commandName": "IISExpress",[m
+[31m-      "launchBrowser": true,[m
+[31m-      "environmentVariables": {[m
+[31m-        "ASPNETCORE_ENVIRONMENT": "Development"[m
+[31m-      }[m
+[31m-    }[m
+[31m-  },[m
+[31m-  "$schema": "https://json.schemastore.org/launchsettings.json",[m
+[31m-  "iisSettings": {[m
+[31m-    "windowsAuthentication": false,[m
+[31m-    "anonymousAuthentication": true,[m
+[31m-    "iisExpress": {[m
+[31m-      "applicationUrl": "http://localhost:60653/",[m
+[31m-      "sslPort": 44300[m
+[31m-    }[m
+[31m-  }[m
+[31m-}[m
+\ No newline at end of file[m
+[1mdiff --git a/API_STPS/Views/Normas/Create.cshtml b/API_STPS/Views/Normas/Create.cshtml[m
+[1mdeleted file mode 100644[m
+[1mindex 79aa274..0000000[m
+[1m--- a/API_STPS/Views/Normas/Create.cshtml[m
+[1m+++ /dev/null[m
+[36m@@ -1,43 +0,0 @@[m
+[31m-﻿@model API_STPS.Models.Normas[m
+[31m-[m
+[31m-@{[m
+[31m-    ViewData["Title"] = "Create";[m
+[31m-}[m
+[31m-[m
+[31m-<h1>Create</h1>[m
+[31m-[m
+[31m-<h4>Normas</h4>[m
+[31m-<hr />[m
+[31m-<div class="row">[m
+[31m-    <div class="col-md-4">[m
+[31m-        <form asp-action="Create">[m
+[31m-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>[m
+[31m-            <div class="form-group">[m
+[31m-                <label asp-for="categoria_noms" class="control-label"></label>[m
+[31m-                <input asp-for="categoria_noms" class="form-control" />[m
+[31m-                <span asp-validation-for="categoria_noms" class="text-danger"></spa

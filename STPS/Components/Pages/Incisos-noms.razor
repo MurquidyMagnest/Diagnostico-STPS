@@ -1,4 +1,4 @@
-﻿@page "/Incisos-noms"
+﻿@page "/noms/{inciso:int}"
 @using System.Text.Json
 
 @using Blazorise
@@ -9,6 +9,7 @@
 @rendermode InteractiveServer
 
 @inject IConfiguration Configuracion;
+@inject NavigationManager NavManager;
 @inject HttpClient Http;
 @inject IJSRuntime JSRuntime
 
@@ -17,82 +18,77 @@
 
 <Div Class="grid-container">
 
+	@if (norma != null)
+	{
+		<h5>@norma.nombre_noms</h5>
+		<h5>@norma.descripcion</h5>
+		<h5>Categoría: @norma.categoria_noms</h5>
+	}
 
-	<!--
-
-		<BlazoredTypeahead SearchMethod="SearchEmployees"
-
-		<BootstrapAutocomplete TItem="Norma"
-					   Data="@normasList"
-	@bind-Value="nombreSeleccionado"
-					   ValueField="@(item => item.Nombre)"
-					   Placeholder="Buscar norma..." />
-	-->
-
-
-
-	<Div Class="form-data">
-		<h3>Incisos</h3>
-		<input @bind="id_noms" placeholder="id_noms" />
-		<input @bind="inciso_noms" placeholder="Inciso" />
-		<input @bind="descripcion" placeholder="Descripción" />
-		<input @bind="comprobacion" placeholder="Comprobación" />
-		<input @bind="criterio_acepton" placeholder="Criterio de aceptación" />
-		<input @bind="observacion" placeholder="Observación" />
-
-
-		<button @onclick="() => PostInciso(id_noms, inciso_noms, comprobacion, descripcion, criterio_acepton, observacion)">Enviar</button>
-
-		@if (!string.IsNullOrEmpty(mensaje))
-		{
-			<p class="success-message">@mensaje</p>
-		}
-	</Div>
 
 	<Div class="table-container">
-		<input @bind="searchTerm" placeholder="Buscar inciso" @oninput="SearchIncisos" />
 
-		<button @onclick="() => GetInciso(searchTerm)">buscar</button>
+		<Div Class="datatable-bar">
+			<button class="btn-agregar action_button" @onclick="() => IsPostModalOpen = true">
+				Nuevo registro
+			</button>
 
-		@if (listaIncisos != null && listaIncisos.Any())
+			<div class="search-container">
+				<input @bind="searchTerm" placeholder="Buscar inciso" @oninput="SearchIncisos" class="search-input" />
+				<button @onclick="() => GetInciso(searchTerm)" class="search-button">Buscar</button>
+			</div>
+		</Div>
+
+		@if (IsSpinner)
 		{
-
-
-			<DataGrid TItem="Incisos_normas" Data="@listaIncisos" ShowPager="true" AllowFiltering="true"
-					  PageSize="8" Class="custom-datagrid">
-				<Columns>
-					<DataGridColumn TItem="Incisos_normas" Field="id" Caption="ID" Width="50" />
-					<DataGridColumn TItem="Incisos_normas" Field="id_noms" Caption="norma" Width="100" />
-					<DataGridColumn TItem="Incisos_normas" Field="inciso_noms" Caption="Inciso" Width="100" />
-					<DataGridColumn TItem="Incisos_normas" Field="descripcion" Caption="Descripción" Width="300" />
-					<DataGridColumn TItem="Incisos_normas" Field="comprobacion" Caption="Comprobación" Width="150" />
-					<DataGridColumn TItem="Incisos_normas" Field="criterio_acepton" Caption="Criterio de aceptación" Width="300" />
-					<DataGridColumn TItem="Incisos_normas" Field="observacion" Caption="Observación" Width="300" />
-
-				
-					<DataGridColumn TItem="Incisos_normas" Caption="Acciones" Width="150">
-						<DisplayTemplate>
-							<button class="action_button" @onclick="() => DeleteInciso(context.id)">
-								<i class="fas fa-trash"></i> 
-							</button>
-							<button class="action_button" type="button" @onclick="() => EditarInciso(context)">
-								<i class="fas fa-edit"></i> 
-							</button>
-						</DisplayTemplate>
-					</DataGridColumn>
-
-				</Columns>
-			</DataGrid>
-
-
+			<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
 		}
 		else
 		{
-			<h1>Aquí no hay nada</h1>
+			@if (listaIncisos != null && listaIncisos.Any())
+			{
+
+
+				<DataGrid TItem="IncisoNormaDTO" Data="@listaIncisos" ShowPager="true" AllowFiltering="true"
+				PageSize="8" Class="custom-datagrid">
+					<Columns>
+						<DataGridColumn TItem="IncisoNormaDTO" Field="inciso_noms" Caption="Inciso" Width="100" />
+						<DataGridColumn TItem="IncisoNormaDTO" Field="descripcion" Caption="Descripción" Width="300" />
+						<DataGridColumn TItem="IncisoNormaDTO" Field="comprobacion" Caption="Comprobación" Width="150" />
+						<DataGridColumn TItem="IncisoNormaDTO" Field="criterio_acepton" Caption="Criterio de aceptación" Width="300" />
+						<DataGridColumn TItem="IncisoNormaDTO" Field="observacion" Caption="Observación" Width="300" />
+
+
+						<DataGridColumn TItem="IncisoNormaDTO" Caption="Acciones" Width="150">
+							<DisplayTemplate>
+								<Div class="action-buttons">
+									<button class="action_button" type="button" @onclick="() => EditarInciso(context)">
+										<i class="fas fa-edit"></i>
+									</button>
+									<button type="button" class="action_button" @onclick="async () => await IncisoModal(context.id, context.inciso_noms)">
+										<i class="fas fa-trash"></i>
+									</button>
+								</Div>
+							</DisplayTemplate>
+						</DataGridColumn>
+
+					</Columns>
+				</DataGrid>
+
+
+			}
+			else
+			{
+				<Div Class="not-found">
+					<img id="not-found-img" src="assets/not-found.png">
+					<p>Sin resultados para mostrar</p>
+				</Div>
+			}
 		}
 	</Div>
 
 </Div>
+
 
 
 <!-- MODAL DE EDICIÓN -->
@@ -100,26 +96,101 @@
 {
 	<div class="modal-overlay">
 		<div class="modal">
-			<h3>Editar Inciso</h3>
-			<input @bind="incisoSeleccionado.id_noms" placeholder="ID NOMS" />
-			<input @bind="incisoSeleccionado.inciso_noms" placeholder="Inciso" />
-			<input @bind="incisoSeleccionado.descripcion" placeholder="Descripción" />
-			<input @bind="incisoSeleccionado.comprobacion" placeholder="Comprobación" />
-			<input @bind="incisoSeleccionado.criterio_acepton" placeholder="Criterio de Aceptación" />
-			<input @bind="incisoSeleccionado.observacion" placeholder="Observación" />
+			<h3>Editar inciso</h3>
 
-			<button class="btn btn-success" @onclick="() => UpdateIncisoAsync(incisoSeleccionado)">Guardar Cambios</button>
-			<button class="btn btn-secondary" @onclick="() => CerrarModal()">Cancelar</button>
+			<p>Inciso</p>
+			<input @bind="incisoSeleccionado.inciso_noms" placeholder="Inciso" />
+			<p>Descripción</p>
+			<textarea @bind="incisoSeleccionado.descripcion" placeholder="Descripción" />
+			<p>Comprobación</p>
+			<input @bind="incisoSeleccionado.comprobacion" placeholder="Comprobación" />
+			<p>Criterio de aceptación</p>
+			<textarea @bind="incisoSeleccionado.criterio_acepton" placeholder="Criterio de Aceptación" />
+			<p>Observación</p>
+			<textarea @bind="incisoSeleccionado.observacion" placeholder="Observación" />
+
+			<button class="btn btn-primary me-2" style="width: 150px;"
+			@onclick="() => UpdateIncisoAsync(
+            incisoSeleccionado.id,
+            inciso,
+            incisoSeleccionado.inciso_noms,
+            incisoSeleccionado.descripcion,
+            incisoSeleccionado.comprobacion,
+            incisoSeleccionado.criterio_acepton,
+            incisoSeleccionado.observacion)">
+				Guardar
+			</button>
+
+			<button class="btn btn-secondary" style="width: 150px;"
+			@onclick="() => CerrarModal()">
+				Cancelar
+			</button>
+
 		</div>
 	</div>
 }
 
 
 
+<!-- MODAL DE ENVÍO -->
+@if (IsPostModalOpen)
+{
+	<div class="modal-overlay">
+		<div class="modal">
+
+			<h3>Nuevo inciso</h3>
+
+
+			<input @bind="form.inciso_noms" placeholder="Inciso" />
+			<input @bind="form.descripcion" placeholder="Descripción" />
+			<input @bind="form.comprobacion" placeholder="Comprobación" />
+			<input @bind="form.criterio_acepton" placeholder="Criterio de aceptación" />
+			<input @bind="form.observacion" placeholder="Observación" />
+
+
+			<button class="btn btn-primary me-2" style="width: 150px;"
+			@onclick="() => PostInciso(form.inciso_noms, form.comprobacion, form.descripcion, form.criterio_acepton, form.observacion)">
+				Enviar
+			</button>
+
+			<button class="btn btn-secondary" style="width: 150px;"
+			@onclick="() => CerrarModal()">
+				Cancelar
+			</button>
+
+
+			@if (!string.IsNullOrEmpty(mensaje))
+			{
+				<p class="success-message">@mensaje</p>
+			}
+
+
+		</div>
+	</div>
+}
+
+
+<!-- ¿ESTÁS SEGURO DE QUERER ELIMINAR ESTE REGISTRO? -->
+@if (IsDeleteModalOpen)
+{
+	<div class="modal-delete">
+		<div class="modal-inf-delete">
+			<h3>¿Deseas eliminar el inciso @inciso_noms?</h3> 
+			<div class="modal-buttons">
+				<button class="btn-confirmar" @onclick="async () => await DeleteInciso(id)">Eliminar</button>
+				<button class="btn-cancelar" @onclick="() => IsDeleteModalOpen = false">Cancelar</button>
+			</div>
+		</div>
+	</div>
+}
+
 @code {
+	[Parameter]
+	public int inciso { get; set; }
+
 	private string? UrlApi;
-	// private Normas Incisos = new Normas();
 	private string searchTerm = "";
+	private int id = 0;
 	private int id_noms = 0;
 	private string inciso_noms = "";
 	private string comprobacion = "";
@@ -127,97 +198,37 @@
 	private string criterio_acepton = "";
 	private string observacion = "";
 	private string mensaje = "";
-	private bool IsEditModalOpen = false; // Estado del modal
-	private Incisos_normas incisoSeleccionado = new Incisos_normas();
+	private bool IsEditModalOpen = false; 
+	private bool IsPostModalOpen = false;
+	private bool IsDeleteModalOpen = false;
+	//private bool EliminarInciso = false;
 
-	private List<Incisos_normas> listaIncisos = new List<Incisos_normas>();
+	private bool IsSpinner = true;
+
+	private Normas? norma;
+
+
+	private IncisoNormaDTO incisoSeleccionado = new IncisoNormaDTO();
+
+	private List<IncisoNormaDTO> listaIncisos = new List<IncisoNormaDTO>();
 	private List<Normas> listaNormas = new List<Normas>();
 
 	public IEnumerable<Normas>? normas;
 
 
+	private IncisoNormaDTO form = new();
+
 	private string? nombre_noms;
-	private string selectedNorma;
-
-	/*
-	private IEnumerable<Normas> NormasDataProvider(string searchText)
-	{
-		if (normas is null) 
-			normas = GetNormas(); 
-
-		
-		return normas.Where(n => n.nombre_noms.Contains(searchText, StringComparison.InvariantCultureIgnoreCase))
-						.OrderBy(norma => norma.nombre_noms);
-	}
-	*/
-
-
-	private string searchQuery = string.Empty;
-	// private string selectedValue = string.Empty;
-	private int selectedValue = 0;
-
-	/*
-
-	private bool SearchItems(string value, string searchString)
-	{
-		if (searchString == "")
-		{
-			return true;
-		}
-
-		if (value.StartsWith(searchString, StringComparison.CurrentCultureIgnoreCase))
-		{
-			return true;
-		}
-
-		return false;
-	}
-
-	*/
+	private Normas selectedNorma;
+	private Normas selectedNormaEdit;
 
 
 	protected override async Task OnInitializedAsync()
 	{
 		UrlApi = Configuracion["ConfiguracionesAplicacion:UrlApi"];
-		await GetInciso();
+		await GetInciso(searchTerm);
 		await GetNorma();
-	}
 
-	/*
-	private void OnValueChanged(object value)
-	{
-		selectedNorma = value.ToString();
-	}
-
-	private IEnumerable<Normas> filteredItems => listaNormas
-	.Where(item => item.nombre_noms.Contains(searchQuery, StringComparison.OrdinalIgnoreCase));
-
-	private void SelectItem(int id)
-	{
-		selectedValue = id;
-		searchQuery = listaNormas.FirstOrDefault(x => x.id == id)?.nombre_noms;
-	}
-	*/
-
-	private void EditarInciso(Incisos_normas inciso)
-	{
-		incisoSeleccionado = new Incisos_normas
-			{
-				id = inciso.id,
-				id_noms = inciso.id_noms,
-				inciso_noms = inciso.inciso_noms,
-				descripcion = inciso.descripcion,
-				comprobacion = inciso.comprobacion,
-				criterio_acepton = inciso.criterio_acepton,
-				observacion = inciso.observacion
-			};
-		IsEditModalOpen = true;
-	}
-
-	// Método para cerrar el modal
-	private void CerrarModal()
-	{
-		IsEditModalOpen = false;
 	}
 
 	private async Task SearchIncisos()
@@ -225,25 +236,47 @@
 		await GetInciso(searchTerm);
 	}
 
+
+	public async Task GetNorma()
+	{
+		try
+		{
+			var response = await Http.GetStringAsync($"{UrlApi}normas/{inciso}");
+
+
+			norma = JsonSerializer.Deserialize<Normas>(response);
+
+			if (norma != null)
+			{
+				StateHasChanged();
+			}
+			else
+			{
+				await JSRuntime.InvokeVoidAsync("console.log", "No se recibieron datos.");
+			}
+		}
+		catch (Exception ex)
+		{
+			await JSRuntime.InvokeVoidAsync("console.log", $"Error: {ex.Message}");
+		}
+	}
+
 	public async Task GetInciso(string searchTerm = "")
 	{
 		var response = "";
 
+
 		try
 		{
-			if (searchTerm == "")
-			{
-				response = await Http.GetStringAsync($"{UrlApi}incisos");
-			}
-			else
-			{
-				response = await Http.GetStringAsync($"{UrlApi}incisos/busqueda_inciso?searchTerm={searchTerm}");
-			}
 
-			//  var response = await Http.GetStringAsync($"{UrlApi}/busqueda_noms?searchTerm={searchTerm}");
-			//await JSRuntime.InvokeVoidAsync("console.log", response);
 
-			var incisos = JsonSerializer.Deserialize<List<Incisos_normas>>(response);
+			response = await Http.GetStringAsync($"{UrlApi}incisos/noms/{inciso}");
+
+
+
+
+
+			var incisos = JsonSerializer.Deserialize<List<IncisoNormaDTO>>(response);
 
 			if (incisos != null)
 			{
@@ -259,15 +292,50 @@
 		{
 			//await JSRuntime.InvokeVoidAsync("console.log", "Error: " + ex.Message);
 		}
+
+		IsSpinner = false;
 	}
 
-	public async Task PostInciso(int id_noms, string inciso_noms, string comprobacion, string descripcion, string criterio_acepton, string observacion)
+
+	private void EditarInciso(IncisoNormaDTO inciso)
 	{
-		
+		incisoSeleccionado = new IncisoNormaDTO
+			{
+				id = inciso.id,
+				id_noms = inciso.id_noms,
+				nombre_noms = inciso.nombre_noms,
+				inciso_noms = inciso.inciso_noms,
+				descripcion = inciso.descripcion,
+				comprobacion = inciso.comprobacion,
+				criterio_acepton = inciso.criterio_acepton,
+				observacion = inciso.observacion
+			};
+
+		selectedNormaEdit = listaNormas.FirstOrDefault(n => n.id == inciso.id_noms);
+
+
+
+
+		IsEditModalOpen = true;
+	}
+
+	// Método para cerrar el modal
+	private void CerrarModal()
+	{
+		IsEditModalOpen = false;
+		IsPostModalOpen = false;
+		form = new IncisoNormaDTO();
+		mensaje = "";
+	}
+
+
+	public async Task PostInciso(string inciso_noms, string comprobacion, string descripcion, string criterio_acepton, string observacion)
+	{
+
 		var nuevoInciso = new
 		{
 
-			id_noms = id_noms,
+			id_noms = inciso,
 			inciso_noms = inciso_noms,
 			comprobacion = comprobacion,
 			descripcion = descripcion,
@@ -285,14 +353,10 @@
 		{
 			Console.WriteLine("Norma agregada correctamente.");
 			mensaje = "✅ Inciso agregado correctamente.";
-			id_noms = 0;
-			inciso_noms = "";
-			comprobacion = "";
-			criterio_acepton = "";
-			observacion = "";
-			descripcion = "";
 
 			await GetInciso("");
+
+			form = new IncisoNormaDTO();
 
 
 		}
@@ -304,9 +368,17 @@
 		}
 	}
 
+	private async Task IncisoModal(int idInciso, string inciso)
+	{
+		id = idInciso;
+		inciso_noms = inciso;
+		IsDeleteModalOpen = true;
+
+	}
 
 	private async Task DeleteInciso(int idInciso)
 	{
+
 		try
 		{
 			var url = $"{UrlApi}incisos/{idInciso}";
@@ -314,36 +386,55 @@
 
 			if (response.IsSuccessStatusCode)
 			{
-				mensaje = "✅ inciso eliminado correctamente.";
-				//await GetInciso("");
 
+				//	EliminarInciso = false;
+				GetInciso("");
+				IsDeleteModalOpen = false;
+
+				}
+				else
+				{
+					
+				}
 			}
-			else
+			catch (Exception ex)
 			{
-				mensaje = "❌ Error al eliminar el inciso.";
+				// Captura errores de conexión o cualquier excepción
+				Console.WriteLine($"Error: {ex.Message}");
 			}
-		}
-		catch (Exception ex)
-		{
-			// Captura errores de conexión o cualquier excepción
-			Console.WriteLine($"Error: {ex.Message}");
-		}
+		
 	}
 
-	private async Task UpdateIncisoAsync(Incisos_normas inciso)
+	//private async Task UpdateIncisoAsync(IncisoNormaDTO inciso)
+	private async Task UpdateIncisoAsync(int id, int idNoms, string inciso_noms, string descripcion, string comprobacion, string criterio, string observacion)
 	{
 		try
 		{
-		
+
+			var inciso = new Incisos_normas
+				{
+					id = id,
+					id_noms = idNoms,
+					inciso_noms = inciso_noms,
+					descripcion = descripcion,
+					comprobacion = comprobacion,
+					criterio_acepton = criterio,
+					observacion = observacion
+				};
+
 			var response = await Http.PutAsJsonAsync($"{UrlApi}incisos", inciso);
 
-		
+			await JSRuntime.InvokeVoidAsync("console.log", inciso);
+
 			if (response.IsSuccessStatusCode)
 			{
 				mensaje = "✅ Inciso actualizado correctamente.";
-				
-				await GetInciso("");  
-				CerrarModal(); 
+
+
+
+
+				await GetInciso("");
+				CerrarModal();
 			}
 			else
 			{
@@ -355,38 +446,5 @@
 			mensaje = "❌ Ocurrió un error: " + ex.Message;
 		}
 	}
-
-
-	public async Task GetNorma()
-	{
-		var response = "";
-
-		try
-		{
-
-			response = await Http.GetStringAsync($"{UrlApi}normas");
-
-
-			//  var response = await Http.GetStringAsync($"{UrlApi}/busqueda_noms?searchTerm={searchTerm}");
-			await JSRuntime.InvokeVoidAsync("console.log", response);
-
-			var normas = JsonSerializer.Deserialize<List<Normas>>(response);
-
-			if (normas != null)
-			{
-				listaNormas = normas;
-				StateHasChanged();
-			}
-			else
-			{
-				await JSRuntime.InvokeVoidAsync("console.log", "No se recibieron datos.");
-			}
-		}
-		catch (Exception ex)
-		{
-			//await JSRuntime.InvokeVoidAsync("console.log", "Error: " + ex.Message);
-		}
-	}
-
 
 }

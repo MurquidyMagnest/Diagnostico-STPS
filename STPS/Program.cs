@@ -8,6 +8,8 @@ var builder = WebApplication.CreateBuilder(args);
 // Agregar HttpClient a los servicios
 builder.Services.AddHttpClient();
 builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
+
+
 builder.Services
     .AddBlazorise(options =>
     {

@@ -4,65 +4,87 @@
 
 @inject IConfiguration Configuracion;
 @inject HttpClient Http;
-@inject IJSRuntime JSRuntime
+@inject IJSRuntime JSRuntime;
+@inject NavigationManager UriHelper;
+
 
 <PageTitle>Normas Oficiales Mexicanas de Seguridad y Salud en el Trabajo</PageTitle>
 
 
 <Div Class="grid-container">
 
+	<h3>Normas</h3>
 
-	<Div Class="form-data">
-		<h3>Normas</h3>
-		<input @bind="categoria" placeholder="Categoría" />
-		<input @bind="nombre" placeholder="Nombre" />
-		<input @bind="descripcion" placeholder="Descripción" />
-		<button @onclick="() => PostNorma(categoria, nombre, descripcion)">Enviar</button>
-
-		@if (!string.IsNullOrEmpty(mensaje))
-		{
-			<p class="success-message">@mensaje</p>
-		}
-	</Div>
 
 	<Div class="table-container">
-		<input @bind="searchTerm" placeholder="Buscar norma" @oninput="SearchNormas" />
 
-		<button @onclick="() => GetNorma(searchTerm)">buscar</button>
+		<Div Class="datatable-bar">
+			<button class="btn-agregar action_button" @onclick="() => IsEnvioModalOpen = true">
+				Nuevo registro
+			</button>
 
-		@if (listaNormas != null && listaNormas.Any())
+			<div class="search-container">
+				<input @bind="searchTerm" placeholder="Buscar norma" @oninput="SearchNormas" class="search-input" />
+				<button @onclick="() => GetNorma(searchTerm)" class="search-button">Buscar</button>
+			</div>
+		</Div>
+
+		@if (IsSpinner)
 		{
-			<DataGrid TItem="Normas" Data="@listaNormas" ShowPager="true" AllowSorting="true" AllowFiltering="true"
-			PageSize="8" Class="custom-datagrid">
-				<Columns>
-					<DataGridColumn TItem="Normas" Field="id" Caption="ID" Width="50" />
-					<DataGridColumn TItem="Normas" Field="categoria_noms" Caption="Categoría" Width="150" />
-					<DataGridColumn TItem="Normas" Field="nombre_noms" Caption="Nombre" Width="200" />
-					<DataGridColumn TItem="Normas" Field="descripcion" Caption="Descripción" Width="300" />
-
-					<!-- Columna de Acciones con iconos -->
-					<DataGridColumn TItem="Normas" Caption="Acciones" Width="150">
-						<DisplayTemplate>
-							<button class="action_button" @onclick="() => DeleteNorma(context.id)">
-								<i class="fas fa-trash"></i> <!-- Icono de eliminación -->
-							</button>
-							<button class="action_button" type="button" @onclick="() => EditarNorma(context)">
-								<i class="fas fa-edit"></i> <!-- Icono de eliminación -->
-							</button>
-						</DisplayTemplate>
-					</DataGridColumn>
-
-
-
-				</Columns>
-			</DataGrid>
-
-
+			<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
 		}
 		else
 		{
-			<h1>Aquí no hay nada</h1>
+			@if (listaNormas != null && listaNormas.Any())
+			{
+
+
+				<DataGrid TItem="Normas" Data="@listaNormas" ShowPager="true" AllowSorting="true" AllowFiltering="true"
+				PageSize="8" Class="custom-datagrid">
+					<Columns>
+
+
+						<DataGridColumn TItem="Normas" Field="categoria_noms" Caption="Categoría" Width="150" />
+
+						<DataGridColumn TItem="Normas" Field="@nameof(Normas.nombre_noms)" Caption="Nombre">
+							<DisplayTemplate>
+								<span @onclick="@(() => onChange(context.nombre_noms, context.id))" style="cursor:pointer; color:blue;">
+									@context.nombre_noms
+								</span>
+							</DisplayTemplate>
+						</DataGridColumn>
+						<DataGridColumn TItem="Normas" Field="descripcion" Caption="Descripción" Width="300" />
+
+						<!-- Columna de Acciones con iconos -->
+						<DataGridColumn TItem="Normas" Caption="Acciones" Width="150">
+							<DisplayTemplate>
+								<Div class="action-buttons">
+									<button class="action_button" type="button" @onclick="() => EditarNorma(context)">
+										<i class="fas fa-edit"></i> <!-- Icono de eliminación -->
+									</button>
+									<button class="action_button" type="button" @onclick="async () => await ModalNorma(context.id, context.nombre_noms)">
+										<i class="fas fa-trash"></i> <!-- Icono de eliminación -->
+									</button>
+								</Div>
+							</DisplayTemplate>
+						</DataGridColumn>
+
+
+
+					</Columns>
+				</DataGrid>
+
+
+			}
+			else
+			{
+				<Div Class="not-found">
+					<img id="not-found-img" src="assets/not-found.png">
+					<p>Sin resultados para mostrar</p>
+				</Div>
+			}
 		}
+
 	</Div>
 
 </Div>
@@ -78,13 +100,66 @@
 			<input @bind="normaSeleccionada.nombre_noms" placeholder="Descripción" />
 			<input @bind="normaSeleccionada.descripcion" placeholder="Comprobación" />
 
-			<button class="btn btn-success" @onclick="() => UpdateNormaAsync(normaSeleccionada)">Guardar Cambios</button>
-			<button class="btn btn-secondary" @onclick="() => CerrarModal()">Cancelar</button>
+			<button class="btn btn-primary me-2" style="width: 150px;"
+			@onclick="() => UpdateNormaAsync(normaSeleccionada)">
+				Guardar
+			</button>
+
+			<button class="btn btn-secondary" style="width: 150px;"
+			@onclick="() => CerrarModal()">
+				Cancelar
+			</button>
+
 		</div>
 	</div>
 }
 
 
+<!-- MODAL DE ENVÍO -->
+@if (IsEnvioModalOpen)
+{
+
+	<div class="modal-overlay">
+		<div class="modal">
+			<h3>Nueva norma</h3>
+			<input @bind="form.categoria_noms" placeholder="Categoría" />
+			<input @bind="form.nombre_noms" placeholder="Nombre" />
+			<input @bind="form.descripcion" placeholder="Descripción" />
+
+			<button class="btn btn-primary me-2" style="width: 150px;"
+			@onclick="() => PostNorma(form.categoria_noms, form.nombre_noms, form.descripcion)">
+				Enviar
+			</button>
+
+			<button class="btn btn-secondary" style="width: 150px;"
+			@onclick="() => CerrarModal()">
+				Cancelar
+			</button>
+
+
+			@if (!string.IsNullOrEmpty(mensaje))
+			{
+				<p class="success-message">@mensaje</p>
+			}
+		</div>
+	</div>
+
+}
+
+<!-- ¿ESTÁS SEGURO DE QUERER ELIMINAR ESTE REGISTRO? -->
+@if (IsDeleteModalOpen)
+{
+	<div class="modal-delete">
+		<div class="modal-inf-delete">
+			<h3>¿Deseas eliminar la norma @nombre?</h3>
+			<p>Si lo haces, se perderán tus incisos.</p>
+			<div class="modal-buttons">
+				<button class="btn-confirmar" @onclick="async () => await DeleteNorma(idNoms)">Eliminar</button>
+				<button class="btn-cancelar" @onclick="() => IsDeleteModalOpen = false">Cancelar</button>
+			</div>
+		</div>
+	</div>
+}
 
 
 @code {
@@ -96,10 +171,17 @@
 	private string descripcion = "";
 	private string mensaje = "";
 	private int idNoms = 0;
+	public string State = "";
 
 	private bool IsEditModalOpen = false;
+	private bool IsEnvioModalOpen = false;
+	private bool IsDeleteModalOpen = false;
+
+	private bool IsSpinner = true;
+
 	private Normas normaSeleccionada = new Normas();
 
+	private Normas form = new();
 
 
 	private List<Normas> listaNormas = new List<Normas>();
@@ -109,6 +191,14 @@
 		UrlApi = Configuracion["ConfiguracionesAplicacion:UrlApi"];
 		await GetNorma("");
 
+	}
+
+
+
+	void onChange(string ruta, int id)
+	{
+
+		UriHelper.NavigateTo("noms/" + id);
 	}
 
 	private void EditarNorma(Normas norma)
@@ -124,10 +214,15 @@
 		IsEditModalOpen = true;
 	}
 
-	
+
 	private void CerrarModal()
 	{
 		IsEditModalOpen = false;
+		IsEnvioModalOpen = false;
+		form = new Normas();
+		mensaje = "";
+
+
 	}
 
 	private async Task SearchNormas()
@@ -169,11 +264,13 @@
 		{
 			//await JSRuntime.InvokeVoidAsync("console.log", "Error: " + ex.Message);
 		}
+
+		IsSpinner = false;
 	}
 
 	public async Task PostNorma(string categoria, string nombre, string descripcion)
 	{
-	
+
 		var nuevaNorma = new
 		{
 			categoria_noms = categoria,
@@ -181,10 +278,10 @@
 			descripcion = descripcion
 		};
 
-	
+
 		var response = await Http.PostAsJsonAsync($"{UrlApi}normas", nuevaNorma);
 
-	
+
 		if (response.IsSuccessStatusCode)
 		{
 			Console.WriteLine("Norma agregada correctamente.");
@@ -193,6 +290,12 @@
 			nombre = "";
 			descripcion = "";
 
+
+			await GetNorma("");
+
+
+			form = new Normas();
+
 		}
 		else
 		{
@@ -200,6 +303,14 @@
 			mensaje = "❌ Error al agregar la norma.";
 
 		}
+	}
+
+	private async Task ModalNorma(int id_norma, string nom_norma)
+	{
+		idNoms = id_norma;
+		nombre = nom_norma;
+		IsDeleteModalOpen = true;
+
 	}
 
 	private async Task DeleteNorma(int idNoms)
@@ -211,12 +322,13 @@
 
 			if (response.IsSuccessStatusCode)
 			{
-				mensaje = "✅ Norma eliminada correctamente.";
+			
 				GetNorma();
+				IsDeleteModalOpen = false;
 			}
 			else
 			{
-				mensaje = "❌ Error al agregar al eliminar la norma.";
+				
 			}
 		}
 		catch (Exception ex)
@@ -231,16 +343,16 @@
 	{
 		try
 		{
-		
+
 			var response = await Http.PutAsJsonAsync($"{UrlApi}normas", norma);
 
-			
+
 			if (response.IsSuccessStatusCode)
 			{
 				mensaje = "✅ Norma actualizada correctamente.";
-			
-				await GetNorma("");  
-				CerrarModal(); 
+
+				await GetNorma("");
+				CerrarModal();
 			}
 			else
 			{
@@ -252,5 +364,5 @@
 			mensaje = "❌ Ocurrió un error: " + ex.Message;
 		}
 	}
-	
+
 }
